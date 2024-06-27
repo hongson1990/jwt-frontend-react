@@ -4,7 +4,7 @@ import { fetchAllUser, deleteUser } from '../../services/userServices';
 import ReactPaginate from 'react-paginate';
 import { toast } from 'react-toastify';
 import ModalDelete from './ModalDelete';
-
+import ModalUser from './ModalUser';
 
 const Users = (props) => {
     const [listUsers, setListUsers] = useState([]);
@@ -12,6 +12,7 @@ const Users = (props) => {
     const [currentLimit, setCurrentLimit] = useState(2);
     const [totalPage, setTotalPage] = useState(0);
     const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+    const [isShowModalUser, setIsShowModalUser] = useState(false);
     const [dataModal, setDataModal] = useState({});
 
     useEffect(() => {
@@ -132,6 +133,12 @@ const Users = (props) => {
                     show={isShowModalDelete}
                     handleClose={handleClose}
                     confirmDeleteUser={confirmDeleteUser}
+                    dataModal={dataModal}
+                />
+
+                <ModalUser
+                    show={isShowModalUser}
+                    title={"Create new user"}
                     dataModal={dataModal}
                 />
             </div>
