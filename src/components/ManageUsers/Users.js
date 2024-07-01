@@ -54,6 +54,11 @@ const Users = (props) => {
         setDataModal({});
     }
 
+    const handleCloseModalUser = async () => {
+        setIsShowModalUser(false);
+        await fetchUsers();
+    }
+
     return (
         <>
             <div className='container'>
@@ -64,7 +69,9 @@ const Users = (props) => {
                         </div>
                         <div className='action'>
                             <button className='btn btn-success'>Refesh</button>
-                            <button className='btn btn-primary'>Add new user</button>
+                            <button className='btn btn-primary'
+                                onClick={() => setIsShowModalUser(true)}
+                            >Add new user</button>
                         </div>
                     </div>
                     <div className='user-body'>
@@ -139,7 +146,7 @@ const Users = (props) => {
                 <ModalUser
                     show={isShowModalUser}
                     title={"Create new user"}
-                    dataModal={dataModal}
+                    handleClose={handleCloseModalUser}
                 />
             </div>
         </>
