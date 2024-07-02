@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import _ from 'lodash';
 
 const ModalUser = (props) => {
+    const { action, dataModalUser } = props;
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [username, setUsername] = useState("");
@@ -41,7 +42,16 @@ const ModalUser = (props) => {
 
     useEffect(() => {
         getGroup();
+        if (props.action === 'UPDATE') {
+            setUserData({ ...dataModalUser, group: dataModalUser.Group ? dataModalUser.Group.id : '' });
+        }
     }, []);
+
+    useEffect(() => {
+        if (action === 'UPDATE') {
+            setUserData(dataModalUser);
+        }
+    }, [dataModalUser]);
 
     const getGroup = async () => {
         let res = await fetchGroup();
@@ -87,9 +97,15 @@ const ModalUser = (props) => {
             if (res.data && res.data.EC === 0) {
                 props.handleClose();
                 setUserData({ ...defaultUserData, group: userGroups[0].id });
-            } else {
-                toast.error(`Error create user...`);
             }
+
+            if (res.data && res.data.EC !== 0) {
+                toast.error(res.data.EM);
+                let _validInputs = _.cloneDeep(validInputsDefault);
+                _validInputs[res.data.DT] = false;
+                setValidInputs(_validInputs);
+            }
+
         }
     }
 
@@ -99,20 +115,22 @@ const ModalUser = (props) => {
             <Modal size='lg' show={props.show} onHide={props.handleClose} className='modal-user'>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        <span>{props.title}</span>
+                        <span>{props.action === 'CREATE' ? 'Create new user' : 'Edit a user'}</span>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className='content-body row'>
                         <div className='col-12 col-sm-6 form-group'>
                             <label>Email adress <span className='red'>(*)</span>:</label>
-                            <input className={validInputs.email ? 'form-control' : 'form-control is-invalid'} type='email' value={userData.email}
+                            <input disabled={action === 'CREATE' ? false : true}
+                                className={validInputs.email ? 'form-control' : 'form-control is-invalid'} type='email' value={userData.email}
                                 onChange={(event) => handleOnChangeInput(event.target.value, "email")}
                             />
                         </div>
                         <div className='col-12 col-sm-6 form-group'>
                             <label>Phone number <span className='red'>(*)</span>:</label>
-                            <input className={validInputs.phone ? 'form-control' : 'form-control is-invalid'} type='text' value={userData.phone}
+                            <input disabled={action === 'CREATE' ? false : true}
+                                className={validInputs.phone ? 'form-control' : 'form-control is-invalid'} type='text' value={userData.phone}
                                 onChange={(event) => handleOnChangeInput(event.target.value, "phone")}
                             />
                         </div>
@@ -122,12 +140,21 @@ const ModalUser = (props) => {
                                 onChange={(event) => handleOnChangeInput(event.target.value, "username")}
                             />
                         </div>
+
                         <div className='col-12 col-sm-6 form-group'>
-                            <label>Password <span className='red'>(*)</span>:</label>
-                            <input className={validInputs.password ? 'form-control' : 'form-control is-invalid'} type='password' value={userData.password}
-                                onChange={(event) => handleOnChangeInput(event.target.value, "password")}
-                            />
+                            {
+                                action === 'CREATE'
+                                &&
+                                <>
+                                    <label>Password <span className='red'>(*)</span>:</label>
+                                    <input className={validInputs.password ? 'form-control' : 'form-control is-invalid'} type='password' value={userData.password}
+                                        onChange={(event) => handleOnChangeInput(event.target.value, "password")}
+                                    />
+                                </>
+                            }
                         </div>
+
+
                         <div className='col-12 col-sm-12 form-group'>
                             <label>Address:</label>
                             <input className='form-control' type='text' value={userData.address}
