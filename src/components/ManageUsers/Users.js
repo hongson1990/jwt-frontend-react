@@ -23,9 +23,9 @@ const Users = (props) => {
 
     const fetchUsers = async () => {
         let response = await fetchAllUser(currentPage, currentLimit);
-        if (response && response.data && response.data.EC === 0) {
-            setListUsers(response.data.DT.users);
-            setTotalPage(response.data.DT.totalPage);
+        if (response && response.EC === 0) {
+            setListUsers(response.DT.users);
+            setTotalPage(response.DT.totalPage);
         }
     }
 
@@ -36,12 +36,12 @@ const Users = (props) => {
     const confirmDeleteUser = async () => {
         let response = await deleteUser(dataModal);
         console.log(response);
-        if (response && response.data.EC === 0) {
-            toast.success(response.data.EM);
+        if (response && response.EC === 0) {
+            toast.success(response.EM);
             await fetchUsers();
             setIsShowModalDelete(false);
         } else {
-            toast.error(response.data.EM);
+            toast.error(response.EM);
         }
     }
 
@@ -58,6 +58,7 @@ const Users = (props) => {
 
     const handleCloseModalUser = async () => {
         setIsShowModalUser(false);
+        setdataModalUser({});
         await fetchUsers();
     }
 
@@ -67,19 +68,24 @@ const Users = (props) => {
         setIsShowModalUser(true);
     }
 
+    const handleRefresh = async () => {
+        await fetchUsers();
+    }
+
     return (
         <>
             <div className='container'>
                 <div className='manage-users-container'>
                     <div className='user-header'>
-                        <div className='title'>
-                            <h3>Table Users</h3>
+                        <div className='title mt-3'>
+                            <h3>Manage Users</h3>
                         </div>
-                        <div className='action mb-2'>
-                            <button className='btn btn-success mx-1'>Refesh</button>
+                        <div className='action my-3'>
+                            <button className='btn btn-success mx-1'
+                                onClick={() => handleRefresh()}> <i className='fa fa-refresh'></i>Refesh</button>
                             <button className='btn btn-primary'
-                                onClick={() => setIsShowModalUser(true)}
-                            >Add new user</button>
+                                onClick={() => { setIsShowModalUser(true); setActionModalUser("CREATE") }}
+                            ><i className='fa fa-plus-circle'></i>Add new user</button>
                         </div>
                     </div>
                     <div className='user-body'>
@@ -106,10 +112,12 @@ const Users = (props) => {
                                                     <td>{item.username}</td>
                                                     <td>{item.Group ? item.Group.name : ''}</td>
                                                     <td>
-                                                        <button className='btn btn-warning mx-1'
-                                                            onClick={() => handleEditUser(item)}>Edit</button>
-                                                        <button className='btn btn-danger'
-                                                            onClick={() => handleDeleteUser(item)}>Delete</button>
+                                                        <span className='edit'
+                                                            title='Edit'
+                                                            onClick={() => handleEditUser(item)}><i className='fa fa-pencil' /></span>
+                                                        <span className='delete'
+                                                            title='Delete'
+                                                            onClick={() => handleDeleteUser(item)}><i className='fa fa-trash-o' /></span>
                                                     </td>
                                                 </tr>
                                             )
@@ -158,7 +166,7 @@ const Users = (props) => {
                     action={actionModalUser}
                     dataModalUser={dataModalUser}
                 />
-            </div>
+            </div >
         </>
     );
 }
