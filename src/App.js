@@ -1,12 +1,12 @@
 import './App.scss';
-import Nav from './components/Navigation/Nav';
 import { BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useEffect, useState, useContext } from 'react';
+import { useContext } from 'react';
 import AppRoutes from './routes/AppRoutes';
 import { TailSpin } from 'react-loader-spinner';
 import { UserContext } from "./context/UserContext";
+import NavHeader from './components/Navigation/NavHeader';
 
 function App() {
   const { user } = useContext(UserContext);
@@ -35,7 +35,7 @@ function App() {
           :
           <>
             <div className='app-header'>
-              <Nav />
+              <NavHeader />
             </div>
             <div className='app-container'>
               <AppRoutes />
