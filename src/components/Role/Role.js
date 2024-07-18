@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
+import { createRoles } from '../../services/roleServices';
 
 const Role = (props) => {
     const dataChildDefault = {
@@ -33,12 +34,28 @@ const Role = (props) => {
         setListChild(_listChilds);
     }
 
-    const handleSave = () => {
+    const buildDataToPersist = () => {
+        let _listChilds = _.cloneDeep(listChild);
+        let data = [];
+        Object.entries(_listChilds).map(([key, child], index) => {
+            data.push({
+                url: child.url,
+                description: child.description
+            });
+        });
+        return data;
+    }
+
+    const handleSave = async () => {
         let invalidObj = Object.entries(listChild).find(([key, child], index) => {
             return child && !child.url;
         });
         if (!invalidObj) {
-
+            let data = buildDataToPersist();
+            let res = await createRoles(data);
+            if (res && res.EC === 0) {
+                toast.success(res.EM);
+            }
         } else {
             toast.error('Input URL must not be empty...');
             console.log(">>> invalid:", invalidObj);
