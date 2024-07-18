@@ -1,26 +1,35 @@
 import React, { useState, useContext } from 'react';
 import './NavHeader.scss';
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useHistory } from "react-router-dom";
 import Navbar from 'react-bootstrap/Navbar';
 import { UserContext } from "../../context/UserContext";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import logo from '../../logo.svg'
+import logo from '../../logo.svg';
+import { logoutUser } from '../../services/userServices';
+import { toast } from 'react-toastify';
 
 const NavHeader = (props) => {
-    const { user } = useContext(UserContext);
+    const { user, logoutContext } = useContext(UserContext);
     let location = useLocation();
+    const history = useHistory();
+
+    const handleLogout = async () => {
+        let data = await logoutUser();
+        localStorage.removeItem('jwt');
+        logoutContext();
+        if (data && +data.EC === 0) {
+            toast.success('Logout succeeds...');
+            history.push('/login')
+        } else {
+            toast.error(data.EM);
+        }
+    }
 
     if (user && user.isAuthen === true || location.pathname === '/') {
         return (
             <>
-                {/* <div className='topnav'>
-                    <NavLink to="/" exact>Home</NavLink>
-                    <NavLink to="/users">Users</NavLink>
-                    <NavLink to="/projects">Projects</NavLink>
-                    <NavLink to="/about">About</NavLink>
-                </div > */}
                 <div className='nav-header'>
                     <Navbar bg="header" expand="lg">
                         <Container>
@@ -38,20 +47,30 @@ const NavHeader = (props) => {
                                 <Nav className="me-auto">
                                     <NavLink className='nav-link' to="/" exact>Home</NavLink>
                                     <NavLink className='nav-link' to="/users">Users</NavLink>
+                                    <NavLink className='nav-link' to="/roles">Roles</NavLink>
                                     <NavLink className='nav-link' to="/projects">Projects</NavLink>
                                     <NavLink className='nav-link' to="/about">About</NavLink>
                                 </Nav>
                                 <Nav>
-                                    <Nav.Item className='nav-link'>
-                                        Welcome Son !
-                                    </Nav.Item>
-                                    <NavDropdown title="Settings" id="basic-nav-dropdown">
-                                        <NavDropdown.Item href="#action/3.1">Change Password</NavDropdown.Item>
-                                        <NavDropdown.Divider />
-                                        <NavDropdown.Item href="#action/3.4">
-                                            Logout
-                                        </NavDropdown.Item>
-                                    </NavDropdown>
+                                    {user && user.isAuthen === true
+                                        ?
+                                        <>
+                                            <Nav.Item className='nav-link'>
+                                                Welcome {user.account.username} !
+                                            </Nav.Item>
+                                            <NavDropdown title="Settings" id="basic-nav-dropdown">
+                                                <NavDropdown.Item>Change Password</NavDropdown.Item>
+                                                <NavDropdown.Divider />
+                                                <NavDropdown.Item>
+                                                    <span onClick={() => handleLogout()}>Logout</span>
+                                                </NavDropdown.Item>
+                                            </NavDropdown>
+                                        </>
+                                        :
+                                        <Link className='nav-link' to='/login'>
+                                            Login
+                                        </Link>
+                                    }
                                 </Nav>
                             </Navbar.Collapse>
                         </Container>
