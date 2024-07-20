@@ -1,12 +1,14 @@
 import React from 'react';
 import './Register.scss';
-import { useHistory } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { useHistory, Link } from "react-router-dom";
+import { useEffect, useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { registerNewUser } from '../../services/userServices';
+import { UserContext } from "../../context/UserContext";
 
 const Register = (props) => {
+    const { user } = useContext(UserContext);
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [username, setUsername] = useState("");
@@ -40,6 +42,9 @@ const Register = (props) => {
     }
 
     useEffect(() => {
+        if (user && user.isAuthen) {
+            history.push('/');
+        }
     }, []);
 
     const isValidInputs = () => {
@@ -85,7 +90,7 @@ const Register = (props) => {
                 <div className='row px-3 px-sm-0'>
                     <div className='content-left col-12 d-none col-sm-7 d-sm-block'>
                         <div className='brand'>
-                            Nguyen Hong Son
+                            <Link to='/'><span title='Return to HomePage'>Son</span></Link>
                         </div >
                         <div className='detail'>
                             JWT Demo.
@@ -124,6 +129,12 @@ const Register = (props) => {
                         <hr />
                         <div className='text-center'>
                             <button className='btn btn-success' onClick={() => handleLogin()}>Already have an account? Login</button>
+                            <div className='mt-3 return'>
+                                <Link to='/'>
+                                    <i className='fa fa-arrow-circle-left'></i>
+                                    <span title='Return to HomePage'>Return to HomePage</span>
+                                </Link>
+                            </div>
                         </div>
                     </div >
                 </div >
